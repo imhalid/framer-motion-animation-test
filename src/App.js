@@ -1,23 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import Movie from "./Movie";
+import Filter from "./Filter";
+import { motion, AnimatePresence } from "framer-motion";
 
 function App() {
+  const [movies, setMovie] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [activeGenre, setActiveGenre] = useState(0);
+
+  const getData = async () => {
+    const response = async () => {
+      const response = await fetch(
+        "https://api.themoviedb.org/3/movie/popular?api_key=c757a5f5cb8f4e809768da63141fd41c&language=en-US&page=1"
+      );
+      const data = await response.json();
+      setMovie(data.results);
+      setFiltered(data.results);
+    };
+    response();
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="w-[90%] mt-14 flex flex-col mx-auto items-center">
+      <Filter
+        className="inline"
+        setFiltered={setFiltered}
+        activeGenre={activeGenre}
+        setActiveGenre={setActiveGenre}
+        movies={movies}
+      />
+      <motion.div className="flex flex-wrap justify-center">
+        <AnimatePresence>
+          {filtered.map((populer) => {
+            return <Movie key={populer.id} populer={populer} />;
+          })}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }
